@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Профиль</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Добро пожаловать!</h1>
+  
+  <!-- Переключение темы -->
+  <div>
+    <label>
+      <input type="checkbox" id="themeToggle"> Тёмная тема
+    </label>
+  </div>
+  
+  <!-- Блок для отображения данных -->
+  <div>
+    <button id="refreshData">Обновить данные</button>
+    <pre id="dataOutput"></pre>
+  </div>
+  
+  <!-- Кнопка выхода -->
+  <div>
+    <button id="logoutBtn">Выход</button>
+  </div>
+  
+  <script>
+    // Применение сохранённой темы
+    const themeToggle = document.getElementById('themeToggle');
+    if(localStorage.getItem('darkTheme') === 'true') {
+      document.body.classList.add('dark');
+      themeToggle.checked = true;
+    }
+    themeToggle.addEventListener('change', () => {
+      if(themeToggle.checked) {
+        document.body.classList.add('dark');
+        localStorage.setItem('darkTheme', 'true');
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('darkTheme', 'false');
+      }
+    });
+
+    // Запрос данных с /data
+    async function fetchData() {
+      const res = await fetch('/data');
+      const result = await res.json();
+      document.getElementById('dataOutput').innerText = JSON.stringify(result, null, 2);
+    }
+    document.getElementById('refreshData').addEventListener('click', fetchData);
+    // Загружаем данные при входе на страницу
+    fetchData();
+
+    // Выход
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      const res = await fetch('/logout', { method: 'POST' });
+      if(res.ok) {
+        window.location.href = '/';
+      }
+    });
+  </script>
+</body>
+</html>
